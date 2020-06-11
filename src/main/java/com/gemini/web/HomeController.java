@@ -17,7 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 public class HomeController {
     @Autowired
@@ -31,7 +31,7 @@ public class HomeController {
     }
 
 
-    @CrossOrigin
+//    @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
     @PostMapping("/api/login")
     public ResponseEntity<Object> login(@RequestParam String username,
                                  @RequestParam String password){
