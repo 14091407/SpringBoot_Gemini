@@ -1,6 +1,8 @@
 package com.gemini.web;
 
+import com.gemini.model.AddSciplanForm;
 import com.gemini.model.Employee;
+import com.gemini.model.LoginForm;
 import com.gemini.model.SciencePlan;
 import com.gemini.repository.EmployeeRepository;
 import com.gemini.repository.SciplanRepository;
@@ -24,17 +26,16 @@ public class HomeController {
     private EmployeeRepository employeeRepository;
     @Autowired
     private SciplanRepository sciplanRepository;
-    @CrossOrigin
+
     @GetMapping("/")
     public @ResponseBody String root() {
         return "Welcome welcome";
     }
 
-
-//    @CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
-    @PostMapping("/api/login")
-    public ResponseEntity<Object> login(@RequestParam String username,
-                                 @RequestParam String password){
+    @PostMapping(path = "/api/login",consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> login(@RequestBody LoginForm loginForm){
+        String username = loginForm.getUsername();
+        String password = loginForm.getPassword();
 //        test user
         Employee user = new Employee('0', "naipawat","password","Naipawat","Poolsawat");
         employeeRepository.save(user);
@@ -52,40 +53,23 @@ public class HomeController {
         return new ResponseEntity<>("User not found",HttpStatus.OK);
     }
 
-    @CrossOrigin
-    @PostMapping("/api/addsciplan")
-    public ResponseEntity<String> addSciplan(@RequestParam int planNo,
-                                             @RequestParam String creator,
-                                             @RequestParam String submiter,
-                                             @RequestParam double fundingInUSD,
-                                             @RequestParam String objectives,
-                                             @RequestParam String starSystem,
-                                             @RequestParam String startDate,
-                                             @RequestParam String endDate,
-                                             @RequestParam String TELESCOPELOC,
-                                             //TELESCOPELOC = {String TELESCOPELOC :HAWAII or CHILE}
-                                             @RequestParam ArrayList<String> dataProcRequirements,
-                                             //dataProcRequirement =
-                                             //{string 'fileType':'RAW'or'PNG'or'JPEG'or'TIFF'
-                                             //,double 'fileQuality'
-                                             //,string 'COLOR_TYPE':'BW'or'COLOR'
-                                             //,double 'contrast'
-                                             //,double 'brightness'
-                                             //,double 'saturation'}
-                                             @RequestParam ArrayList<String> observingProgram,
-                                             //observingProgram =
-                                             //{int 'id'
-                                             //LocationElement : {double longitude,double latitude,double radius}
-                                             //Lens : {String make,String model, String manufacturer, int year}
-                                             //ArrayList<Filter> for each Filter {String make,String model,String manufacturer,int year,double size,double weight}}
-                                             //ArrayList<Double>
-                                             //boolean isLightDetectorOn
-                                             //ArrayList<SpecialEquipment> for each SpecialEquipment {String equipmentName,String ownerName,Date installedDate}
-                                             @RequestParam String status,
-                                             //status = {String 'status': COMPLETE or RUNNING or SUMMITTED}
-
-                                            @RequestParam String token) throws ParseException {
-//        Token checking
+    @PostMapping(path="/api/addsciplan",consumes = "application/json", produces = "application/json")
+    public ResponseEntity<String> addSciplan(@RequestHeader(name = "X-COM-PERSIST") String headerPersist
+                                            ,@RequestBody AddSciplanForm addSciplanForm) throws ParseException {
+        JSONObject tokenJSON = new JSONObject(headerPersist);
+        String creator = addSciplanForm.getCreator();
+        String startDate = addSciplanForm.getStartDate();
+        String endDate = addSciplanForm.getEndDate();
+        String submiter = addSciplanForm.getSubmiter();
+        Double fundingInUSD = addSciplanForm.getFundingInUSD();
+        String objectives = addSciplanForm.getObjectives();
+        String starSystem = addSciplanForm.getStarSystem();
+        String TELESCOPELOC = addSciplanForm.getTELESCOPELOC();
+        ArrayList<String> dataProcRequirements = addSciplanForm.getDataProcRequirements();
+        ArrayList<String> observingProgram = addSciplanForm.getObservingProgram();
+        String status = addSciplanForm.getStatus();
+        String token = tokenJSON.get("token").toString();
+        //        Token checking
         String[] parts = token.split("\\.");
         String decoded1 = new String(Base64.getUrlDecoder().decode(parts[1]));
         JSONObject test = new JSONObject(decoded1);
@@ -99,14 +83,12 @@ public class HomeController {
         return new ResponseEntity<>("SciPlan Added",HttpStatus.OK);
     }
 
-    @CrossOrigin
     @GetMapping("/api/getsciplan")
     public @ResponseBody
     Iterable<SciencePlan> getSciplan(){
         return sciplanRepository.findAll();
     }
 
-    @CrossOrigin
     @PostMapping("/api/validate")
     public ResponseEntity<String> validateSciplan(int PlanNo,boolean humanValidation){
         SciencePlan sciencePlan = sciplanRepository.findByPlanNo(PlanNo);
@@ -130,7 +112,6 @@ public class HomeController {
         return new ResponseEntity<>("Invalid.. Reason Unknown",HttpStatus.OK);
     }
 
-    @CrossOrigin
     @DeleteMapping("/api/delete/{id}")
     public ResponseEntity<String> removeSciPlanById(@PathVariable("id") int id) {
         // delete a specific hero
