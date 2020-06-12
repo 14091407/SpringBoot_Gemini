@@ -14,13 +14,7 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @Entity
 public class ObservingProgram {
-    @JsonProperty("locationElement")
-    private LocationElement loc;
     private boolean isLightDetectorOn;
-    @ElementCollection
-    @CollectionTable
-    @JsonProperty("specialEquipment")
-    private List<String> specialEquipments;
     @OneToMany(cascade = CascadeType.ALL)
     @JsonProperty("filter")
     private List<filter> filters;
@@ -28,22 +22,31 @@ public class ObservingProgram {
     @CollectionTable
     @JsonProperty("exposures")
     private List<Double> exposures;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JsonProperty("lens")
     private lens lens;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonProperty("locationElement")
+    private locationElement loc;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonProperty("specialEquipment")
+    private List<specialEquipment> specialEquipments;
 
     @Id
     private int id;
 
     public ObservingProgram(){}
 
-    public ObservingProgram(LocationElement locationElement
-            , ArrayList<String> specialEquipments
+    public ObservingProgram(locationElement locationElement
+            , ArrayList<specialEquipment> specialEquipments
             , ArrayList<filter> filter
             , ArrayList<Double> exposures
             , lens lens, boolean isLightDetectorOn
     ){
-        this.loc = new LocationElement();
+        this.loc = locationElement;
         this.filters = filter;
         this.exposures = exposures;
         this.lens = lens;
@@ -51,7 +54,7 @@ public class ObservingProgram {
         this.specialEquipments = specialEquipments;
     }
 
-    public LocationElement getLoc() {
+    public locationElement getLoc() {
         return loc;
     }
 
@@ -71,7 +74,7 @@ public class ObservingProgram {
         return isLightDetectorOn;
     }
 
-    public ArrayList<String> getSpecialEquipments() {
+    public ArrayList<specialEquipment> getSpecialEquipments() {
         return new ArrayList<>(specialEquipments);
     }
 }

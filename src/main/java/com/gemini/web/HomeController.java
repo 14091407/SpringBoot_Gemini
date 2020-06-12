@@ -80,18 +80,21 @@ public class HomeController {
         ObservingProgram observingProgram = addSciplanForm.getObservingProgram();
         String status = addSciplanForm.getStatus();
                 //        Token checking
-        String username = Jwts.parser()
+        try{
+            String username = Jwts.parser()
                 .setSigningKey("secretkey")
                 .parseClaimsJws(headerPersist.replace("Bearer",""))
                 .getBody()
                 .getSubject();
-        String creator = username;
-
-//        Date formatting
+            String creator = username;
+            //        Date formatting
         Date StartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
         Date EndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
         sciplanRepository.save(new SciencePlan(creator,fundingInUSD,objectives,starSystem,StartDate,EndDate,TELESCOPELOC,dataProcRequirements,observingProgram,status));
         return new ResponseEntity<>("SciPlan Added",HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>("Invalid header was passed, wrong token",HttpStatus.OK);
+        }
     }
 //(String creator
 //            , String submitter, double fundingInUSD
@@ -102,12 +105,32 @@ public class HomeController {
     @GetMapping("/api/getsciplan")
     public @ResponseBody
     ArrayList<SciencePlan> getSciplan() throws ParseException {
+        filter filter = new filter("testsetse","mamamama","222A",2000,200,200);
+        ArrayList<filter> filters = new ArrayList<>();
+        filters.add(filter);
+        ArrayList<Double> exposures = new ArrayList<>();
+        exposures.add((double) 2);
+        exposures.add((double) 3);
+        locationElement loc = new locationElement();
+        loc.setLatitude(Double.parseDouble("133"));
+        loc.setRadius(Double.parseDouble("10"));
+        loc.setLongitude(Double.parseDouble("60"));
+        System.out.println(loc.getLatitude());
+
+        specialEquipment sp = new specialEquipment("eqNametest","ownerNametest","installedDatetest");
+        ArrayList<specialEquipment> sps = new ArrayList<>();
+        sps.add(sp);
+
         SciencePlan SciplanValidated = new SciencePlan("naipawat"
                 ,new Double(200),"objectives101"
                 ,"SUN",new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-10")
                 , new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-20")
-                ,"HAWAII",new dataProc("PNG",100,"COLOR",0,0,0)
-                ,new ObservingProgram(),"COMPLETE");
+                ,"HAWAII",new dataProc("PNG",100,"COLOR",-10,60,90)
+                ,new ObservingProgram(loc,sps
+                                        ,filters,exposures
+                                        ,new lens("maketest","modeltest","manutest",1998)
+                                        ,true)
+                ,"COMPLETE");
 //        SciplanValidated.setValidated(true);
 //        SciencePlan SciplanNoValidated = new SciencePlan("naipawat"
 //        ,new Double(99999999),"WRONGOBJECTIVE"
@@ -123,6 +146,7 @@ public class HomeController {
 //        ,new ArrayList<>(Arrays.asList("","","")),"SUBMITTED");
 //        SciplanValidated.setValidated(true);
 //        SciplanValidated2.setValidated(true);
+        SciplanValidated.setValidated(true);
         sciplanRepository.save(SciplanValidated);
 //        sciplanRepository.save(SciplanNoValidated);
 //        sciplanRepository.save(SciplanValidated2);
@@ -141,19 +165,19 @@ public class HomeController {
 //        ,new SimpleDateFormat("dd/MM/yyyy").parse("30/10/2020"),"HAWAII"
 //        ,new ArrayList<>(Arrays.asList("","",""))
 //        ,new ArrayList<>(Arrays.asList("","","")),"RUNNING");
-        filter filter = new filter("","","",2000,200,200);
-        ArrayList<filter> filters = new ArrayList<>();
-        filters.add(filter);
-                SciencePlan SciplanValidated = new SciencePlan("naipawat"
-                ,new Double(200),"objectives101"
-                ,"SUN",new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-10")
-                , new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-20")
-                ,"HAWAII",new dataProc("PNG",100,"COLOR",0,0,0)
-                ,new ObservingProgram(new LocationElement(1,1,1)
-                        , new ArrayList<String>(Arrays.asList("","",""))
-                        , filters, new ArrayList<Double>(0)
-                        , new lens(),true),"COMPLETE");
-                sciplanRepository.save(SciplanValidated);
+//        filter filter = new filter("","","",2000,200,200);
+//        ArrayList<filter> filters = new ArrayList<>();
+//        filters.add(filter);
+//                SciencePlan SciplanValidated = new SciencePlan("naipawat"
+//                ,new Double(200),"objectives101"
+//                ,"SUN",new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-10")
+//                , new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-20")
+//                ,"HAWAII",new dataProc("PNG",100,"COLOR",0,0,0)
+//                ,new ObservingProgram(new locationElement((double)133,(double)155,(double)177)
+//                        , new ArrayList<String>(Arrays.asList("","",""))
+//                        , filters, new ArrayList<Double>(0)
+//                        , new lens(),true),"COMPLETE");
+//                sciplanRepository.save(SciplanValidated);
         return sciplanRepository.findByValidated(false);
     }
 
