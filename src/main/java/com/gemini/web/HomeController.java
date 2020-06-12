@@ -6,6 +6,7 @@ import com.gemini.repository.EmployeeRepository;
 import com.gemini.repository.SciplanRepository;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jparsec.ephem.Target;
+import jparsec.observer.LocationElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class HomeController {
         String username = loginForm.getUsername();
         String password = loginForm.getPassword();
 //        test user
-        Employee user = new Employee('0', "naipawat","password","Naipawat","Poolsawat");
+        Employee user = new Employee("naipawat","password","Naipawat","Poolsawat");
         employeeRepository.save(user);
         if(employeeRepository.findByUsername(username) != null)
         {
@@ -87,8 +88,8 @@ public class HomeController {
         String creator = username;
 
 //        Date formatting
-        Date StartDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate);
-        Date EndDate = new SimpleDateFormat("dd/MM/yyyy").parse(endDate);
+        Date StartDate = new SimpleDateFormat("yyyy-MM-dd").parse(startDate);
+        Date EndDate = new SimpleDateFormat("yyyy-MM-dd").parse(endDate);
         sciplanRepository.save(new SciencePlan(creator,fundingInUSD,objectives,starSystem,StartDate,EndDate,TELESCOPELOC,dataProcRequirements,observingProgram,status));
         return new ResponseEntity<>("SciPlan Added",HttpStatus.OK);
     }
@@ -101,12 +102,12 @@ public class HomeController {
     @GetMapping("/api/getsciplan")
     public @ResponseBody
     ArrayList<SciencePlan> getSciplan() throws ParseException {
-//        SciencePlan SciplanValidated = new SciencePlan("naipawat"
-//                ,new Double(200),"objectives101"
-//                ,"SUN",new SimpleDateFormat("dd/MM/yyyy").parse("20/10/2020")
-//                ,new SimpleDateFormat("dd/MM/yyyy").parse("30/10/2020"),"HAWAII"
-//                ,new ArrayList<>(Arrays.asList("","",""))
-//                ,new ArrayList<>(Arrays.asList("","","")),"COMPLETE");
+        SciencePlan SciplanValidated = new SciencePlan("naipawat"
+                ,new Double(200),"objectives101"
+                ,"SUN",new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-10")
+                , new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-20")
+                ,"HAWAII",new dataProc("PNG",100,"COLOR",0,0,0)
+                ,new ObservingProgram(),"COMPLETE");
 //        SciplanValidated.setValidated(true);
 //        SciencePlan SciplanNoValidated = new SciencePlan("naipawat"
 //        ,new Double(99999999),"WRONGOBJECTIVE"
@@ -122,9 +123,11 @@ public class HomeController {
 //        ,new ArrayList<>(Arrays.asList("","","")),"SUBMITTED");
 //        SciplanValidated.setValidated(true);
 //        SciplanValidated2.setValidated(true);
-//        sciplanRepository.save(SciplanValidated);
+        sciplanRepository.save(SciplanValidated);
 //        sciplanRepository.save(SciplanNoValidated);
 //        sciplanRepository.save(SciplanValidated2);
+        System.out.println(
+                SciplanValidated.getObservingProgram());
 
         return sciplanRepository.findByValidated(true);
     }
@@ -138,11 +141,24 @@ public class HomeController {
 //        ,new SimpleDateFormat("dd/MM/yyyy").parse("30/10/2020"),"HAWAII"
 //        ,new ArrayList<>(Arrays.asList("","",""))
 //        ,new ArrayList<>(Arrays.asList("","","")),"RUNNING");
+        filter filter = new filter("","","",2000,200,200);
+        ArrayList<filter> filters = new ArrayList<>();
+        filters.add(filter);
+                SciencePlan SciplanValidated = new SciencePlan("naipawat"
+                ,new Double(200),"objectives101"
+                ,"SUN",new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-10")
+                , new SimpleDateFormat("yyyy-MM-dd").parse("2020-10-20")
+                ,"HAWAII",new dataProc("PNG",100,"COLOR",0,0,0)
+                ,new ObservingProgram(new LocationElement(1,1,1)
+                        , new ArrayList<String>(Arrays.asList("","",""))
+                        , filters, new ArrayList<Double>(0)
+                        , new lens(),true),"COMPLETE");
+                sciplanRepository.save(SciplanValidated);
         return sciplanRepository.findByValidated(false);
     }
 
     @PostMapping("/api/validate")
-    public ResponseEntity<String> validateSciplan(int PlanNo,boolean humanValidation){
+    public ResponseEntity<String> validateSciplan(int PlanNo){
         SciencePlan sciencePlan = sciplanRepository.findByPlanNo(PlanNo);
 //        Check starSystem Enum from Target jparsec.ephem
         String[] AvailableNames = Target.getNames();
@@ -156,12 +172,8 @@ public class HomeController {
         //TODO:DataProcRequirements fileType and COLOR_TYPE Enum checking
         //TODO:observingProgram : Try create observingProgram objects by the input received
         //TODO:STATUS Enum checking
-        if(humanValidation){
-            sciencePlan.setValidated(true);
-            sciplanRepository.save(sciencePlan);
-            return new ResponseEntity<>("Valid!",HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Invalid.. Reason Unknown",HttpStatus.OK);
+
+        return new ResponseEntity<>("Valid!",HttpStatus.OK);
     }
 
     @DeleteMapping("/api/delete/{id}")

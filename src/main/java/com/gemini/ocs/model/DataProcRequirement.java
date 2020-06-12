@@ -28,7 +28,7 @@ public class DataProcRequirement {
     }
 
     public DataProcRequirement(TYPE fileType, double fileQuality,
-                               COLOR_TYPE colorType, double colors, double contrast,
+                               COLOR_TYPE colorType, double contrast,
                                double brightness, double saturation) {
         this.fileType = fileType;
         this.fileQuality = fileQuality;

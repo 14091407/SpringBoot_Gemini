@@ -1,20 +1,20 @@
 package com.gemini.model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("ALL")
 @Entity
 public class Employee {
+    private static AtomicInteger count = new AtomicInteger(0);
     private String username;
     private String password;
     private String firstname;
     private String lastname;
+
     @Id
     private Integer id;
 
@@ -22,9 +22,9 @@ public class Employee {
 //    @OneToMany(mappedBy = "planNo",cascade = CascadeType.ALL)
 //    private List<SciencePlan> sciencePlans;
 
-    public Employee(int id, String username, String password, String firstname
+    public Employee(String username, String password, String firstname
             , String lastname){
-        this.id = id;
+        this.id = count.incrementAndGet();
         this.username = username;
         this.password = password;
         this.firstname = firstname;

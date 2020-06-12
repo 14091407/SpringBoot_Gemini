@@ -1,5 +1,6 @@
 package com.gemini.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gemini.ocs.model.BaseObservingProgram;
 import com.gemini.ocs.model.DataProcRequirement;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -7,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.Date;
-
 @XmlRootElement
 public class AddSciplanForm {
 
@@ -19,28 +19,52 @@ public class AddSciplanForm {
     String startDate;
     String endDate;
     String TELESCOPELOC;
-    dataProc dataProcRequirements;
+    dataProc dataProcRequirement;
     ObservingProgram observingProgram;
     String status;
-    
-    public AddSciplanForm(){}
-    
-    public AddSciplanForm(String creator, double fundingInUSD
-            , String objectives, String starSystem
-            , String startDate, String endDate
-            , String telescopeLocation, dataProc dataProcRequirements
-            , ObservingProgram observingProgram, String status){
-        this.creator = creator;
+
+    public void setValidated(Boolean validated) {
+        this.validated = validated;
+    }
+
+    public void setFundingInUSD(double fundingInUSD) {
         this.fundingInUSD = fundingInUSD;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public void setObjectives(String objectives) {
         this.objectives = objectives;
+    }
+
+    public void setStarSystem(String starSystem) {
         this.starSystem = starSystem;
+    }
+
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
+    }
+
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
-        this.TELESCOPELOC = telescopeLocation;
-        this.dataProcRequirements = dataProcRequirements;
+    }
+
+    public void setTELESCOPELOC(String TELESCOPELOC) {
+        this.TELESCOPELOC = TELESCOPELOC;
+    }
+
+    public void setDataProcRequirements(dataProc dataProcRequirement) {
+        this.dataProcRequirement = dataProcRequirement;
+    }
+
+    public void setObservingProgram(ObservingProgram observingProgram) {
         this.observingProgram = observingProgram;
+    }
+
+    public void setStatus(String status) {
         this.status = status;
-        this.validated = Boolean.FALSE;
     }
 
     public double getFundingInUSD() {
@@ -68,7 +92,7 @@ public class AddSciplanForm {
     }
 
     public dataProc getDataProcRequirements() {
-        return dataProcRequirements;
+        return dataProcRequirement;
     }
 
     public ObservingProgram getObservingProgram() {

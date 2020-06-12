@@ -72,4 +72,40 @@ public class SciencePlan {
     public String getStarSystem() {
         return starSystem;
     }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public double getFundingInUSD() {
+        return fundingInUSD;
+    }
+
+    public String getObjectives() {
+        return objectives;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public Boolean getValidated() {
+        return validated;
+    }
+
+    public ObservingProgram getObservingProgram() {
+        return observingProgram;
+    }
+
+    public dataProc getDataProcRequirements() {
+        return dataProcRequirements;
+    }
+
+    public int getPlanNo() {
+        return planNo;
+    }
 }
