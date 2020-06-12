@@ -1,9 +1,7 @@
 package com.gemini.web;
 
-import com.gemini.model.AddSciplanForm;
-import com.gemini.model.Employee;
-import com.gemini.model.LoginForm;
-import com.gemini.model.SciencePlan;
+import com.gemini.model.*;
+import com.gemini.ocs.model.DataProcRequirement;
 import com.gemini.repository.EmployeeRepository;
 import com.gemini.repository.SciplanRepository;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,7 +31,7 @@ public class HomeController {
     }
 
     @PostMapping(path = "/api/login",consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> login(@RequestBody LoginForm loginForm){
+    public ResponseEntity<String> login(@RequestBody LoginForm loginForm){
         String username = loginForm.getUsername();
         String password = loginForm.getPassword();
 //        test user
@@ -47,47 +45,100 @@ public class HomeController {
                     JSONObject jsonString =  new JSONObject();
                     jsonString.put("token",Jwts.builder().setSubject(employee.getUsername()).claim("roles", "user").setIssuedAt(new Date())
                             .signWith(SignatureAlgorithm.HS256, "secretkey").compact());
-                    return new ResponseEntity<>(jsonString, HttpStatus.OK);
+                    return new ResponseEntity<>(jsonString.toString(),HttpStatus.OK);
                 }
         }
         return new ResponseEntity<>("User not found",HttpStatus.OK);
     }
 
-    @PostMapping(path="/api/addsciplan",consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> addSciplan(@RequestHeader(name = "X-COM-PERSIST") String headerPersist
-                                            ,@RequestBody AddSciplanForm addSciplanForm) throws ParseException {
-            System.Println.out(addSciplanForm);
-//        JSONObject tokenJSON = new JSONObject(headerPersist);
-//        String creator = addSciplanForm.getCreator();
-//        String startDate = addSciplanForm.getStartDate();
-//        String endDate = addSciplanForm.getEndDate();
-//        String submiter = addSciplanForm.getSubmiter();
-//        Double fundingInUSD = addSciplanForm.getFundingInUSD();
-//        String objectives = addSciplanForm.getObjectives();
-//        String starSystem = addSciplanForm.getStarSystem();
-//        String TELESCOPELOC = addSciplanForm.getTELESCOPELOC();
-//        ArrayList<String> dataProcRequirements = addSciplanForm.getDataProcRequirements();
-//        ArrayList<String> observingProgram = addSciplanForm.getObservingProgram();
-//        String status = addSciplanForm.getStatus();
-//        String token = tokenJSON.get("token").toString();
-//        //        Token checking
-//        String[] parts = token.split("\\.");
-//        String decoded1 = new String(Base64.getUrlDecoder().decode(parts[1]));
-//        JSONObject test = new JSONObject(decoded1);
-//        if(!test.get("sub").toString().equals(creator)){
-//            return new ResponseEntity<>("Please type your username as creator", HttpStatus.OK);
-//        }
-////        Date formatting
-//        Date StartDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate);
-//        Date EndDate = new SimpleDateFormat("dd/MM/yyyy").parse(endDate);
-//        sciplanRepository.save(new SciencePlan(creator,submiter,fundingInUSD,objectives,starSystem,StartDate,EndDate,TELESCOPELOC,dataProcRequirements,observingProgram,status));
-        return new ResponseEntity<>("SciPlan Added",HttpStatus.OK);
+    @PostMapping(path="/api/testtoken",consumes = "application/json", produces = "application/json")
+    public String tokentest(@RequestHeader(name = "token") String headerPersist){
+        try{
+            String username = Jwts.parser()
+                .setSigningKey("secretkey")
+                .parseClaimsJws(headerPersist.replace("Bearer",""))
+                .getBody()
+                .getSubject();
+            System.out.println(username);
+        }catch (Exception e){
+            return "Invalid header was passed";
+        }
+        return "Valid!";
     }
 
+    @PostMapping(path="/api/addsciplan",consumes = "application/json", produces = "application/json")
+    public ResponseEntity<String> addSciplan(@RequestHeader(name = "token") String headerPersist
+                                            ,@RequestBody AddSciplanForm addSciplanForm) throws ParseException {
+        String startDate = addSciplanForm.getStartDate();
+        String endDate = addSciplanForm.getEndDate();
+        Double fundingInUSD = addSciplanForm.getFundingInUSD();
+        String objectives = addSciplanForm.getObjectives();
+        String starSystem = addSciplanForm.getStarSystem();
+        String TELESCOPELOC = addSciplanForm.getTELESCOPELOC();
+        dataProc dataProcRequirements = addSciplanForm.getDataProcRequirements();
+        ObservingProgram observingProgram = addSciplanForm.getObservingProgram();
+        String status = addSciplanForm.getStatus();
+                //        Token checking
+        String username = Jwts.parser()
+                .setSigningKey("secretkey")
+                .parseClaimsJws(headerPersist.replace("Bearer",""))
+                .getBody()
+                .getSubject();
+        String creator = username;
+
+//        Date formatting
+        Date StartDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate);
+        Date EndDate = new SimpleDateFormat("dd/MM/yyyy").parse(endDate);
+        sciplanRepository.save(new SciencePlan(creator,fundingInUSD,objectives,starSystem,StartDate,EndDate,TELESCOPELOC,dataProcRequirements,observingProgram,status));
+        return new ResponseEntity<>("SciPlan Added",HttpStatus.OK);
+    }
+//(String creator
+//            , String submitter, double fundingInUSD
+//            , String objectives, String starSystem
+//            , String startDate, String endDate
+//            , String telescopeLocation, ArrayList<String> dataProcRequirements
+//            , ArrayList<String> observingProgram, String status)
     @GetMapping("/api/getsciplan")
     public @ResponseBody
-    Iterable<SciencePlan> getSciplan(){
-        return sciplanRepository.findAll();
+    ArrayList<SciencePlan> getSciplan() throws ParseException {
+//        SciencePlan SciplanValidated = new SciencePlan("naipawat"
+//                ,new Double(200),"objectives101"
+//                ,"SUN",new SimpleDateFormat("dd/MM/yyyy").parse("20/10/2020")
+//                ,new SimpleDateFormat("dd/MM/yyyy").parse("30/10/2020"),"HAWAII"
+//                ,new ArrayList<>(Arrays.asList("","",""))
+//                ,new ArrayList<>(Arrays.asList("","","")),"COMPLETE");
+//        SciplanValidated.setValidated(true);
+//        SciencePlan SciplanNoValidated = new SciencePlan("naipawat"
+//        ,new Double(99999999),"WRONGOBJECTIVE"
+//        ,"SUN",new SimpleDateFormat("dd/MM/yyyy").parse("20/10/2020")
+//        ,new SimpleDateFormat("dd/MM/yyyy").parse("30/10/2020"),"HAWAII"
+//        ,new ArrayList<>(Arrays.asList("","",""))
+//        ,new ArrayList<>(Arrays.asList("","","")),"RUNNING");
+//        SciencePlan SciplanValidated2 = new SciencePlan("naipawat"
+//        ,new Double(500),"objectives101"
+//        ,"SUN",new SimpleDateFormat("dd/MM/yyyy").parse("20/10/2020")
+//        ,new SimpleDateFormat("dd/MM/yyyy").parse("30/10/2020"),"HAWAII"
+//        ,new ArrayList<>(Arrays.asList("","",""))
+//        ,new ArrayList<>(Arrays.asList("","","")),"SUBMITTED");
+//        SciplanValidated.setValidated(true);
+//        SciplanValidated2.setValidated(true);
+//        sciplanRepository.save(SciplanValidated);
+//        sciplanRepository.save(SciplanNoValidated);
+//        sciplanRepository.save(SciplanValidated2);
+
+        return sciplanRepository.findByValidated(true);
+    }
+
+    @GetMapping("/api/getnonvalidatedsciplan")
+    public @ResponseBody
+    ArrayList<SciencePlan> getNonValidatedSciplan() throws ParseException {
+//        SciencePlan SciplanNoValidated = new SciencePlan("naipawat"
+//        ,new Double(99999999),"WRONGOBJECTIVE"
+//        ,"SUN",new SimpleDateFormat("dd/MM/yyyy").parse("20/10/2020")
+//        ,new SimpleDateFormat("dd/MM/yyyy").parse("30/10/2020"),"HAWAII"
+//        ,new ArrayList<>(Arrays.asList("","",""))
+//        ,new ArrayList<>(Arrays.asList("","","")),"RUNNING");
+        return sciplanRepository.findByValidated(false);
     }
 
     @PostMapping("/api/validate")

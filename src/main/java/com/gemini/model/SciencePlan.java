@@ -18,7 +18,6 @@ import org.hibernate.annotations.DynamicUpdate;
 public class SciencePlan {
     private static AtomicInteger count = new AtomicInteger(0);
     private String creator;
-    private String submitter;
     private double fundingInUSD;
     private String objectives;
     private String starSystem;
@@ -27,23 +26,20 @@ public class SciencePlan {
     private String telescopeLocation;
     private String status;
     private Boolean validated;
-    @ElementCollection
-    @CollectionTable
-    private List<String> dataProcRequirements;
-    @ElementCollection
-    @CollectionTable
-    private List<String> observingProgram;
+    @OneToOne(cascade=CascadeType.ALL)
+    ObservingProgram observingProgram;
+    @OneToOne(cascade=CascadeType.ALL)
+    dataProc dataProcRequirements;
     @Id
     private int planNo;
 
     public SciencePlan(String creator
-            , String submitter, double fundingInUSD
+            , double fundingInUSD
             , String objectives, String starSystem
             , Date startDate, Date endDate
-            , String telescopeLocation, ArrayList<String> dataProcRequirements
-            , ArrayList<String> observingProgram, String status){
+            , String telescopeLocation, dataProc dataProcRequirements
+            , ObservingProgram observingProgram, String status){
         this.creator = creator;
-        this.submitter = submitter;
         this.fundingInUSD = fundingInUSD;
         this.objectives = objectives;
         this.starSystem = starSystem;

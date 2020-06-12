@@ -1,28 +1,46 @@
 package com.gemini.model;
 
+import com.gemini.ocs.model.BaseObservingProgram;
+import com.gemini.ocs.model.DataProcRequirement;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
+import java.util.Date;
 
+@XmlRootElement
 public class AddSciplanForm {
-    String creator;
-    String submiter;
+
+    Boolean validated;
     double fundingInUSD;
+    String creator;
     String objectives;
     String starSystem;
     String startDate;
     String endDate;
     String TELESCOPELOC;
-    ArrayList<String> dataProcRequirements;
-    ArrayList<String> observingProgram;
+    dataProc dataProcRequirements;
+    ObservingProgram observingProgram;
     String status;
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public String getSubmiter() {
-        return submiter;
+    
+    public AddSciplanForm(){}
+    
+    public AddSciplanForm(String creator, double fundingInUSD
+            , String objectives, String starSystem
+            , String startDate, String endDate
+            , String telescopeLocation, dataProc dataProcRequirements
+            , ObservingProgram observingProgram, String status){
+        this.creator = creator;
+        this.fundingInUSD = fundingInUSD;
+        this.objectives = objectives;
+        this.starSystem = starSystem;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.TELESCOPELOC = telescopeLocation;
+        this.dataProcRequirements = dataProcRequirements;
+        this.observingProgram = observingProgram;
+        this.status = status;
+        this.validated = Boolean.FALSE;
     }
 
     public double getFundingInUSD() {
@@ -49,11 +67,11 @@ public class AddSciplanForm {
         return TELESCOPELOC;
     }
 
-    public ArrayList<String> getDataProcRequirements() {
+    public dataProc getDataProcRequirements() {
         return dataProcRequirements;
     }
 
-    public ArrayList<String> getObservingProgram() {
+    public ObservingProgram getObservingProgram() {
         return observingProgram;
     }
 

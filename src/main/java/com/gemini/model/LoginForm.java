@@ -1,5 +1,8 @@
 package com.gemini.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class LoginForm {
     private String username;
     private String password;
