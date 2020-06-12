@@ -56,30 +56,31 @@ public class HomeController {
     @PostMapping(path="/api/addsciplan",consumes = "application/json", produces = "application/json")
     public ResponseEntity<String> addSciplan(@RequestHeader(name = "X-COM-PERSIST") String headerPersist
                                             ,@RequestBody AddSciplanForm addSciplanForm) throws ParseException {
-        JSONObject tokenJSON = new JSONObject(headerPersist);
-        String creator = addSciplanForm.getCreator();
-        String startDate = addSciplanForm.getStartDate();
-        String endDate = addSciplanForm.getEndDate();
-        String submiter = addSciplanForm.getSubmiter();
-        Double fundingInUSD = addSciplanForm.getFundingInUSD();
-        String objectives = addSciplanForm.getObjectives();
-        String starSystem = addSciplanForm.getStarSystem();
-        String TELESCOPELOC = addSciplanForm.getTELESCOPELOC();
-        ArrayList<String> dataProcRequirements = addSciplanForm.getDataProcRequirements();
-        ArrayList<String> observingProgram = addSciplanForm.getObservingProgram();
-        String status = addSciplanForm.getStatus();
-        String token = tokenJSON.get("token").toString();
-        //        Token checking
-        String[] parts = token.split("\\.");
-        String decoded1 = new String(Base64.getUrlDecoder().decode(parts[1]));
-        JSONObject test = new JSONObject(decoded1);
-        if(!test.get("sub").toString().equals(creator)){
-            return new ResponseEntity<>("Please type your username as creator", HttpStatus.OK);
-        }
-//        Date formatting
-        Date StartDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate);
-        Date EndDate = new SimpleDateFormat("dd/MM/yyyy").parse(endDate);
-        sciplanRepository.save(new SciencePlan(creator,submiter,fundingInUSD,objectives,starSystem,StartDate,EndDate,TELESCOPELOC,dataProcRequirements,observingProgram,status));
+            System.Println.out(addSciplanForm);
+//        JSONObject tokenJSON = new JSONObject(headerPersist);
+//        String creator = addSciplanForm.getCreator();
+//        String startDate = addSciplanForm.getStartDate();
+//        String endDate = addSciplanForm.getEndDate();
+//        String submiter = addSciplanForm.getSubmiter();
+//        Double fundingInUSD = addSciplanForm.getFundingInUSD();
+//        String objectives = addSciplanForm.getObjectives();
+//        String starSystem = addSciplanForm.getStarSystem();
+//        String TELESCOPELOC = addSciplanForm.getTELESCOPELOC();
+//        ArrayList<String> dataProcRequirements = addSciplanForm.getDataProcRequirements();
+//        ArrayList<String> observingProgram = addSciplanForm.getObservingProgram();
+//        String status = addSciplanForm.getStatus();
+//        String token = tokenJSON.get("token").toString();
+//        //        Token checking
+//        String[] parts = token.split("\\.");
+//        String decoded1 = new String(Base64.getUrlDecoder().decode(parts[1]));
+//        JSONObject test = new JSONObject(decoded1);
+//        if(!test.get("sub").toString().equals(creator)){
+//            return new ResponseEntity<>("Please type your username as creator", HttpStatus.OK);
+//        }
+////        Date formatting
+//        Date StartDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate);
+//        Date EndDate = new SimpleDateFormat("dd/MM/yyyy").parse(endDate);
+//        sciplanRepository.save(new SciencePlan(creator,submiter,fundingInUSD,objectives,starSystem,StartDate,EndDate,TELESCOPELOC,dataProcRequirements,observingProgram,status));
         return new ResponseEntity<>("SciPlan Added",HttpStatus.OK);
     }
 
